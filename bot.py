@@ -4,7 +4,6 @@ TO DO:
 Get frequency of words
 Set it up to run all the time
 Make sure it replies only once
-Comment shit up
 Make a table for karma breakdown
 Make a chart of graph or something for word frequency
 Keep a list of common words and ignore those words in frequency chart
@@ -63,10 +62,6 @@ def getSubmissionBreakdownBySubreddit(redditor):
 def getWordFrequencyList(commentList):
     #Regex expression to consider only alphanumeric characters.
     stripChars = re.compile(r'[a-zA-z0-9]*')
-    #List of commonly used prepositions and stuff that can be ignored
-    #commonWordList = ['the', 'for', 'and', 'that', 'have', 'to', 'of', 'in', 'it', 'if', 'by', 'me', 'he', 'she', 'we', 'they',
-    # 'on', 'or', 'can', 'then', 'am', 'at', 'my', 'be', 'so', 'as', 'with', 'is', 'do', 'you', 'but', 'this', 'was', 'him', 'her', 'are',
-    # 'his', 'up', 'down']
     #Initializing list of words to count
     frequencyList = []
     #For every comment made by the user
@@ -78,12 +73,9 @@ def getWordFrequencyList(commentList):
             #remove any special characters and convert the word to lower case
             words = stripChars.search(words).group()
             words = words.lower()
-            #Ignore words that are actually single letters or symbols
+            #Ignore words that are less than 5 letters long
             if len(words) < 5:
                 continue
-            #If the word is in the common word list, ignore it
-            #if words in commonWordList:
-            #    continue
             #Find the word in the frequencyList. If it exists, increment it's count
             for existingWords in frequencyList:
                 if existingWords['Word'] == words:
@@ -124,7 +116,7 @@ def runBot(redditor):
     frequencyList = getWordFrequencyList(commentList)
     printComments(frequencyList[:20])
 
-reddit = praw.Reddit('Lan\'s Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Karma Analyzer')
+reddit = praw.Reddit('Lan\'s Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Karma Analyzer Bot')
 
 redditor = startBot(reddit)
 runBot(redditor)
