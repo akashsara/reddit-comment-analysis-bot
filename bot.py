@@ -1,18 +1,4 @@
 #!python3
-'''
-TO DO:
-Set it up to run all the time
-Make sure it replies only once
-Make a table for karma breakdown
-Make a chart of graph or something for word frequency
-Most active subreddits
-Karma/Comment
-Karma/Submission
-karma breakdown for comments by subreddit
-Note: Might not match the karma shown on profiles because for some reason it seems to be ignoring some older self posts. So I'm assuming that it
-does not consider self-post karma before the update that let selfposts give karma
-'''
-
 import praw, datetime, time, re
 from operator import itemgetter
 
