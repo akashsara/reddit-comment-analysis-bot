@@ -1,5 +1,5 @@
 #!python3
-import praw, re, graphs, requests, config, pyperclip
+import praw, re, graphs, requests, config
 from operator import itemgetter
 from imgurpython import ImgurClient
 
