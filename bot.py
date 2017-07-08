@@ -1,128 +1,138 @@
 #!python3
-import praw, datetime, time, re
+import praw, re, graphs, requests, config, pyperclip
 from operator import itemgetter
+from imgurpython import ImgurClient
 
-def getCommentData(redditor):
-    #Iterate through every available comment posted by the user
-    #Add the karma from each comment to the total
-    #Add the text of each comment to the commentList
-    #If the comment has negative karma, add it's karma and message to the downvoteList
-    #If it has positive karma, do the same for the upvoteList
-    #Sort the upvoteList and downvoteList according to their karma and return all 3 lists
-    commentCount = 0
-    totalKarma = 0
-    downvoteList = []
-    upvoteList = []
-    commentList = []
-    subredditList = []
-    for comments in redditor.comments.new(limit=None):
-        totalKarma += (comments.score - 1)
-        commentList.append(comments.body)
-        subredditList = getKarmaBreakdownBySubreddit(subredditList, comments)
-        if(comments.score < 0):
-            downvoteList.append({'Karma': comments.score, 'Message': comments.body})
-        if(comments.score > 0):
-            upvoteList.append({'Karma': comments.score, 'Message': comments.body})
-    downvoteList = sorted(downvoteList, key=itemgetter('Karma'))
-    upvoteList = sorted(upvoteList, key=itemgetter('Karma'), reverse=True)
-    return downvoteList, upvoteList, commentList, subredditList, totalKarma
-
-def getSubmissionData(redditor):
-    #Analze every submission made by the redditor in descending order of karma
-    #Add the submission's score to the total karma
-    #Add the text of each selfpost to the list
-    #Call a function to modify the subredditList
-    #Sort and return the list along with the total karma gained
-    subredditList = []
-    submissionList = []
-    totalKarma = 0
-    for submissions in redditor.submissions.top('all'):
-        totalKarma += (submissions.score - 1)
-        submissionList.append(submissions.selftext)
-        subredditList = getKarmaBreakdownBySubreddit(subredditList, submissions)
-    subredditList = sorted(subredditList, key=itemgetter('Karma'), reverse=True)
-    return subredditList, submissionList, totalKarma
-
-def printComments(commentList):
-    print('------------------------')
-    for comments in commentList:
-        for keys, values in comments.items():
-            print(keys + ': ' + str(values))#[:80] + '...')
-        print('------------------------')
-
-def getKarmaBreakdownBySubreddit(subredditList, thing):
-    #If the subreddit exists in the list, just add the karma from this submission/comment to it
-    #If it does not exist in the list, add the subreddit and the submission/comment's karma
+#Functions to get karma by subreddit for comments and posts separately and then combine them
+def addToSubredditList(subredditList, thing):
+    '''
+    If the subreddit exists in the list, increment the count by one.
+    If the subreddit doesn't exist in the list, add the subreddit and set the count as 1.
+    '''
     for subreddits in subredditList:
         if subreddits['Subreddit Name'] == thing.subreddit:
-            subreddits['Karma'] += (thing.score - 1)
+            subreddits['Count'] += 1
             break
     else:
-        subredditList.append({'Subreddit Name': thing.subreddit, 'Karma': thing.score - 1})
+        subredditList.append({'Subreddit Name': thing.subreddit, 'Count': 1})
     return subredditList
 
-def getWordFrequencyList(commentList):
-    #Create a regex expression to consider only alphanumeric characters.
-    #For every comment made by the user split the comment into a list of individual words based on spaces
-    #For every word in the list remove any special characters and convert the word to lower case
-    #Ignore words that are less than 5 letters long and ignore the https found in some links
-    #Check if the word exists in the frequencyList exists, increment it's count
-    #If it isn't in the list, add it to the list and give it a count of 1
-    #Return the list after sorting in descending order
-    stripChars = re.compile(r'[a-zA-z0-9]*')
-    frequencyList = []
-    for comments in commentList:
-        wordsList = comments.split(' ')
-        for words in wordsList:
-            words = stripChars.search(words).group()
-            words = words.lower()
-            if len(words) < 5 or words == 'https':
-                continue
-            for existingWords in frequencyList:
-                if existingWords['Word'] == words:
-                    existingWords['Count'] += 1
-                    break
-            else:
-                frequencyList.append({'Word': words.lower(), 'Count': 1})
-    return sorted(frequencyList, key=itemgetter('Count'), reverse=True)
-
-def startBot(reddit):
-    #Get username and retrieve details from reddit
-    username = input('Enter your username: ')
-    redditor = reddit.redditor(username)
-    return redditor
-
-def combineSubredditBreakdowns(comment, submission):
-    #Copy comment list to the new list
-    #For every entry in the submission list, check if the subreddit exists in the new list
-    #If it does, add the karma from that to the new list
-    #Else add the entry to the list
-    #Sort and return the new list
+def mergeSubredditLists(comment, submission):
+    '''
+    Merge the two lists:
+    If a subreddit in the second list already exists in the first list, the count of that subreddit is added to its counterpart in the first list.
+    If a subreddit does not exist, it along with its count is added to the end of the list.
+    Return the new list
+    '''
     subredditList = comment
     for subreddit in submission:
         for subs in subredditList:
             if subreddit['Subreddit Name'] == subs['Subreddit Name']:
-                subs['Karma'] += subreddit['Karma']
+                subs['Count'] += subreddit['Count']
                 break
         else:
             subredditList.append(subreddit)
-    return sorted(subredditList, key=itemgetter('Karma'), reverse=True)
+    return subredditList
 
-def runBot(redditor):
-    downvoteList, upvoteList, commentList, subredditListForComments, commentKarma = getCommentData(redditor)
-    subredditListForSubmissions, submissionList, submissionKarma = getSubmissionData(redditor)
-    subredditList = combineSubredditBreakdowns(subredditListForComments, subredditListForSubmissions)
-    totalKarma = commentKarma + submissionKarma
-    printComments(subredditList[:20])
-    print('Total Karma: %s' % totalKarma)
-    print('Comment Karma: %s' %commentKarma)
-    print('Post Karma: %s' %submissionKarma)
-    print('Analysed %s comments and %s posts.' % (len(commentList), len(submissionList)))
-    #frequencyList = getWordFrequencyList(commentList)
-    #frequencyList += getWordFrequencyList(submissionList)
-    #printComments(frequencyList[:20])
+#Functions for retrieving data
+def getCommentData(redditor):
+    '''
+    Iterate through every available comment posted by the user and store each comment's text.
+    Then pass the comment to addToSubredditList() to increment the counter for each subreddit's activity.
+    Return both the list of comments and the subredditList.
+    '''
+    commentList = []
+    subredditList = []
+    for comments in redditor.comments.new(limit=None):
+        commentList.append(comments.body)
+        subredditList = addToSubredditList(subredditList, comments)
+    return commentList, subredditList
 
-reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Karma Analyzer Bot')
+def getSubmissionData(redditor):
+    '''
+    Analyze every submission made by the redditor in descending order of karma. Add the text of each selfpost to the end of the list.
+    Also count the number of links submitted.
+    Call addToSubredditList() to increment or set up the counter.
+    Return both the list of selfposts and the subredditList
+    '''
+    subredditList = []
+    submissionList = []
+    noLinks = 0
+    for submissions in redditor.submissions.top('all'):
+        if submissions.selftext:
+            submissionList.append(submissions.selftext)
+        else:
+            noLinks += 1
+        subredditList = addToSubredditList(subredditList, submissions)
+    return subredditList, submissionList, noLinks
 
-redditor = startBot(reddit)
-runBot(redditor)
+#Word frequency analysis and graph creation functions
+def getWordFrequencyList(commentList):
+    '''
+    Create a regex expression to consider only alphanumeric characters I.E. remove special characters.
+    For every comment made by the user split the comment into a list of individual words separated by spaces.
+    For every word in the list remove any special characters and convert the word to lower case.
+    Ignore words that are less than 5 letters long and ignore the https found in some links.
+    Check if the word exists in the frequencyList, if yes increment its count.
+    If it isn't in the list, add it to the list and give it a count of 1.
+    Return the list after sorting in descending order.
+    '''
+    stripChars = re.compile(r'[a-zA-z0-9]+')
+    frequencyList = []
+    for comments in commentList:
+        wordsList = comments.split(' ')
+        for words in wordsList:
+            if(stripChars.search(words)):
+                words = (stripChars.search(words).group()).lower()
+                if len(words) < 5 or words == 'https':
+                    continue
+                for existingWords in frequencyList:
+                    if existingWords['Word'] == words:
+                        existingWords['Count'] += 1
+                        break
+                else:
+                    frequencyList.append({'Word': words.lower(), 'Count': 1})
+    return sorted(frequencyList, key=itemgetter('Count'), reverse=True)
+
+#Driver functions
+def imgurBot():
+    client = ImgurClient(config.imgurId, config.imgurSecret)
+    frequencyLink = (client.upload_from_path('.\\wordFrequency.png', config=None, anon=True))['link']
+    activityLink = (client.upload_from_path('.\\mostActive.png', config=None, anon=True))['link']
+    return frequencyLink, activityLink
+
+def executeOrder66(username):
+    r = reddit.redditor(username)
+    commentList, subredditListForComments = getCommentData(r)
+    subredditListForSubmissions, submissionList, noLinks = getSubmissionData(r)
+    subredditList = mergeSubredditLists(subredditListForComments, subredditListForSubmissions)
+    noComments = len(commentList)
+    noPosts = len(submissionList)
+    frequencyList = getWordFrequencyList(commentList) + getWordFrequencyList(submissionList)
+    graphs.wordFrequencyGraph(frequencyList[:10], noPosts + noComments)
+    graphs.mostActiveChart(subredditList)
+    frequencyLink, activityLink = imgurBot()
+    message = ('''Hi **/u/%s**! Thanks for calling me. Here's what I've got for you:
+\nYou've commented about **%s** times and submitted **%s** posts, **%s** of which were links. This makes for a total of **%s** submissions. Great job!
+\nI've also taken the liberty of analysing your frequently used words and made a handy chart! [Click here to check it out.](%s)\nAnd since I like making charts, I even made one to show where you spend the majority of your time! [Click here to check out that chart.](%s)
+\n\n---
+[^(Message my Master)](https://www.reddit.com/message/compose?to=DarkeKnight) ^| [^(Source Code)](https://github.com/akashsara/reddit-comment-analysis-bot)
+    ''' %(username, noComments, noPosts, noLinks, noComments + noPosts, frequencyLink, activityLink))
+    return message
+
+reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
+
+repliedList = []
+
+def runBot(reddit, repliedList):
+    for comment in reddit.subreddit('lansbot').comments(limit=25):
+        if ("!!AnalyseMe" in comment.body) and (comment.id not in repliedList) and (comment.author != reddit.user.me()):
+            print('Found a post: ' + comment.id)
+            message = executeOrder66(str(comment.author))
+            comment.reply(message)
+            repliedList.append(comment.id)
+            print('Replied to post!')
+    return repliedList
+
+while True:
+    repliedList = runBot(reddit, repliedList)
