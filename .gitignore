@@ -1,5 +1,5 @@
 praw.ini
+config.py
 __pycache__/
 *.py[cod]
-config.py
 redditCommentAnalyser
