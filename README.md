@@ -16,5 +16,23 @@ It's a bot that analyses the entire* comment history of a reddit user and replie
 **Note:**
 Might not match the karma shown on profiles because for some reason it seems to be ignoring some older self posts. So I'm assuming that it does not consider self-post karma before the update that let selfposts give karma.
 
-## To Do:
-* Set up bot to run on Heroku/AWS
+## Usage:
+
+![Usage](https://i.imgur.com/6SdHFjU.png)
+
+![Chart 1](https://i.imgur.com/2tjSpaP.png)
+
+![Chart 2](https://i.imgur.com/l99rgFT.png)
+
+## Setup:
+
+Create `praw.ini` with the following details
+
+```
+[Reddit Bot]
+client_id = id
+client_secret = secret
+username = reddit_username
+password = reddit_password
+
+```
