@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from operator import itemgetter
 
+#Set up the words as x and its count as y
 def wordFrequencyGraph(wordList, noSubmissions):
     x = []
     y = []
@@ -11,7 +12,7 @@ def wordFrequencyGraph(wordList, noSubmissions):
         y.append(words['Count'])
     makeGraph(x, y, 'Number of Uses', 'Most Used Words in ' + str(noSubmissions) + ' Submissions', 'wordFrequency.png')
 
-
+#Subreddit Name = x, Activity Count = y
 def mostActiveChart(subredditList):
     finalList = []
     x = []

@@ -1,5 +1,5 @@
 #!python3
-import praw, re, graphs, requests, config
+import praw, re, graphs, requests, config, os
 from operator import itemgetter
 from imgurpython import ImgurClient
 
@@ -122,17 +122,29 @@ def executeOrder66(username):
 
 reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
 
-repliedList = []
-
 def runBot(reddit, repliedList):
-    for comment in reddit.subreddit('lansbot').comments(limit=25):
+    for comment in reddit.subreddit('lansbot').comments(limit=None):
         if ("!!AnalyseMe" in comment.body) and (comment.id not in repliedList) and (comment.author != reddit.user.me()):
             print('Found a post: ' + comment.id)
             message = executeOrder66(str(comment.author))
-            comment.reply(message)
+            #comment.reply(message)
             repliedList.append(comment.id)
             print('Replied to post!')
     return repliedList
 
-while True:
-    repliedList = runBot(reddit, repliedList)
+def getListofReplies():
+    if os.path.isfile('.\\replied.txt'):
+        repliedFile = open('.\\replied.txt', 'r')
+        repliedList = repliedFile.readlines()
+        repliedFile.close()
+        return repliedList
+    return []
+
+def addToFile(repliedList):
+    repliedFile = open('.\\replied.txt', 'w')
+    repliedFile.write('\n'.join(repliedList))
+    repliedFile.close()
+
+repliedList = getListofReplies()
+repliedList = runBot(reddit, repliedList)
+addToFile(repliedList)
