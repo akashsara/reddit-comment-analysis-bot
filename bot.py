@@ -113,7 +113,7 @@ def executeOrder66(username):
     graphs.mostActiveChart(subredditList)
     frequencyLink, activityLink = imgurBot()
     message = ('''Hi **/u/%s**! Thanks for calling me. Here's what I've got for you:
-\nYou've commented about **%s** times and submitted **%s** posts, **%s** of which were links. This makes for a total of **%s** submissions. Great job!
+\nI've found about **%s** comments and **%s** posts, **%s** of which were links. This makes for a total of **%s** submissions. Great job!
 \nI've also taken the liberty of analysing your frequently used words and made a handy chart! [Click here to check it out.](%s)\nAnd since I like making charts, I even made one to show where you spend the majority of your time! [Click here to check out that chart.](%s)
 \n\n---
 [^(Message my Master)](https://www.reddit.com/message/compose?to=DarkeKnight) ^| [^(Source Code)](https://github.com/akashsara/reddit-comment-analysis-bot)
