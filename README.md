@@ -18,7 +18,7 @@ Might not match the karma shown on profiles because for some reason it seems to 
 
 ## Usage:
 
-![Usage](https://i.imgur.com/6SdHFjU.png)
+![Usage](https://i.imgur.com/2ltlb4p.png)
 
 ![Chart 1](https://i.imgur.com/2tjSpaP.png)
 
