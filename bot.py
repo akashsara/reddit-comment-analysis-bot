@@ -1,5 +1,5 @@
 #!python3
-import praw, re, graphs, requests, config, os
+import praw, re, graphs, requests, config, os, time
 from operator import itemgetter
 from imgurpython import ImgurClient
 
@@ -130,21 +130,9 @@ def runBot(reddit, repliedList):
             print('Replied to post!')
     return repliedList
 
-def getListofReplies():
-    if os.path.isfile('replied.txt'):
-        repliedFile = open('replied.txt', 'r')
-        repliedList = repliedFile.read()
-        repliedFile.close()
-        return repliedList
-    return []
-
-def addToFile(repliedList):
-    repliedFile = open('replied.txt', 'w')
-    repliedFile.write('\n'.join(repliedList))
-    repliedFile.close()
-
 reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
+repliedList = []
 
-repliedList = getListofReplies()
-repliedList = runBot(reddit, repliedList)
-addToFile(repliedList)
+while True:
+    repliedList = runBot(reddit, repliedList)
+    time.sleep(300)
