@@ -120,14 +120,12 @@ def executeOrder66(username):
     ''' %(username, noComments, noPosts, noLinks, noComments + noPosts, frequencyLink, activityLink))
     return message
 
-reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
-
 def runBot(reddit, repliedList):
     for comment in reddit.subreddit('lansbot').comments(limit=None):
         if ("!!AnalyseMe" in comment.body) and (comment.id not in repliedList) and (comment.author != reddit.user.me()):
             print('Found a post: ' + comment.id)
             message = executeOrder66(str(comment.author))
-            #comment.reply(message)
+            comment.reply(message)
             repliedList.append(comment.id)
             print('Replied to post!')
     return repliedList
@@ -144,6 +142,8 @@ def addToFile(repliedList):
     repliedFile = open('.\\replied.txt', 'w')
     repliedFile.write('\n'.join(repliedList))
     repliedFile.close()
+
+reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
 
 repliedList = getListofReplies()
 repliedList = runBot(reddit, repliedList)
