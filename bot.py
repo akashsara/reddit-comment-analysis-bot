@@ -97,8 +97,8 @@ def getWordFrequencyList(commentList):
 #Driver functions
 def imgurBot():
     client = ImgurClient(config.imgurId, config.imgurSecret)
-    frequencyLink = (client.upload_from_path('.\\wordFrequency.png', config=None, anon=True))['link']
-    activityLink = (client.upload_from_path('.\\mostActive.png', config=None, anon=True))['link']
+    frequencyLink = (client.upload_from_path('wordFrequency.png', config=None, anon=True))['link']
+    activityLink = (client.upload_from_path('mostActive.png', config=None, anon=True))['link']
     return frequencyLink, activityLink
 
 def executeOrder66(username):
@@ -131,15 +131,15 @@ def runBot(reddit, repliedList):
     return repliedList
 
 def getListofReplies():
-    if os.path.isfile('.\\replied.txt'):
-        repliedFile = open('.\\replied.txt', 'r')
-        repliedList = repliedFile.readlines()
+    if os.path.isfile('replied.txt'):
+        repliedFile = open('replied.txt', 'r')
+        repliedList = repliedFile.read()
         repliedFile.close()
         return repliedList
     return []
 
 def addToFile(repliedList):
-    repliedFile = open('.\\replied.txt', 'w')
+    repliedFile = open('replied.txt', 'w')
     repliedFile.write('\n'.join(repliedList))
     repliedFile.close()
 
