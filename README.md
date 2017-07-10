@@ -13,9 +13,6 @@ It's a bot that analyses the entire* comment history of a reddit user and replie
 * Show a graph of user's most active subreddits.
 * Displays some general information about the number of comments and posts.
 
-**Note:**
-Might not match the karma shown on profiles because for some reason it seems to be ignoring some older self posts. So I'm assuming that it does not consider self-post karma before the update that let selfposts give karma.
-
 ## Usage:
 
 ![Usage](https://i.imgur.com/2ltlb4p.png)
