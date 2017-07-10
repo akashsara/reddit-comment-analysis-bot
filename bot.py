@@ -120,19 +120,19 @@ def executeOrder66(username):
     ''' %(username, noComments, noPosts, noLinks, noComments + noPosts, frequencyLink, activityLink))
     return message
 
-def runBot(reddit, repliedList):
+def runBot(reddit):
     for comment in reddit.subreddit('lansbot').comments(limit=None):
-        if ("!!AnalyseMe" in comment.body) and (comment.id not in repliedList) and (comment.author != reddit.user.me()):
+        if comment.saved:
+            continue
+        if ("!!AnalyseMe" in comment.body) and (comment.author != reddit.user.me()):
+            comment.save()
             print('Found a post: ' + comment.id)
             message = executeOrder66(str(comment.author))
             comment.reply(message)
-            repliedList.append(comment.id)
             print('Replied to post!')
-    return repliedList
 
 reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
-repliedList = []
 
 while True:
-    repliedList = runBot(reddit, repliedList)
+    runBot(reddit)
     time.sleep(300)
