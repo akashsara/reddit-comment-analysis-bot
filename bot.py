@@ -77,15 +77,18 @@ def getWordFrequencyList(commentList):
     If it isn't in the list, add it to the list and give it a count of 1.
     Return the list after sorting in descending order.
     '''
+    wordFile = open('commonWords.txt', 'r')
+    commonWordsList = wordFile.read()
+    wordFile.close()
     stripChars = re.compile(r'[a-zA-z0-9]+')
     frequencyList = []
     for comments in commentList:
         wordsList = comments.split(' ')
         for words in wordsList:
+            words = words.lower()
+            if words in commonWordsList:
+                continue
             if(stripChars.search(words)):
-                words = (stripChars.search(words).group()).lower()
-                if len(words) < 5 or words == 'https':
-                    continue
                 for existingWords in frequencyList:
                     if existingWords['Word'] == words:
                         existingWords['Count'] += 1
