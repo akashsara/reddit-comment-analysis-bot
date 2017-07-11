@@ -17,7 +17,7 @@ It's a bot that analyses the entire* comment history of a reddit user and replie
 
 ![Usage](https://i.imgur.com/2ltlb4p.png)
 
-![Chart 1](https://i.imgur.com/2tjSpaP.png)
+![Chart 1](https://i.imgur.com/7N2Besa.png)
 
 ![Chart 2](https://i.imgur.com/l99rgFT.png)
 
