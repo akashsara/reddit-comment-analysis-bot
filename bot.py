@@ -71,8 +71,8 @@ def getWordFrequencyList(commentList):
     '''
     Create a regex expression to consider only alphanumeric characters I.E. remove special characters.
     For every comment made by the user split the comment into a list of individual words separated by spaces.
-    For every word in the list remove any special characters and convert the word to lower case.
-    Ignore words that are less than 5 letters long and ignore the https found in some links.
+    For every word in the list, convert it to lower case and check if it is in the common word list. if yes, ignore it.
+    If it isn't a common word, confirm that it has actual alphabets or numbers and add it to the list.
     Check if the word exists in the frequencyList, if yes increment its count.
     If it isn't in the list, add it to the list and give it a count of 1.
     Return the list after sorting in descending order.
