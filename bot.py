@@ -143,4 +143,4 @@ reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsar
 
 while True:
     runBot(reddit)
-    #time.sleep(300)
+    time.sleep(300)
