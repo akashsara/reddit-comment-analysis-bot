@@ -127,13 +127,13 @@ def runBot(reddit):
     subredditList = ['lansbot', 'india']
     keyWords = ['!!AnalyseMe', '!!AnalyzeMe', '!!analyseme', '!!ANALYSEME', '!!analyzeme', '!!ANALYZEME']
     for subreddit in subredditList:
-        print(subreddit)
+        print('On ' + str(subreddit))
         for comment in reddit.subreddit(subreddit).comments(limit=None):
             if comment.saved:
                 continue
             for keyWord in keyWords:
                 if (keyWord in comment.body) and (comment.author != reddit.user.me()):
-                    print('Found a post ' + comment.id ' by ' + comment.author)
+                    print('Found a post ' + str(comment.id) + ' by ' + str(comment.author))
                     message = executeOrder66(str(comment.author))
                     comment.reply(message)
                     comment.save()
