@@ -125,19 +125,22 @@ def executeOrder66(username):
 
 def runBot(reddit):
     subredditList = ['lansbot', 'india']
+    keyWords = ['!!AnalyseMe', '!!AnalyzeMe', '!!analyseme', '!!ANALYSEME', '!!analyzeme', '!!ANALYZEME']
     for subreddit in subredditList:
+        print(subreddit)
         for comment in reddit.subreddit(subreddit).comments(limit=None):
             if comment.saved:
                 continue
-            if ("!!AnalyseMe" in comment.body) and (comment.author != reddit.user.me()):
-                comment.save()
-                print('Found a post: ' + comment.id)
-                message = executeOrder66(str(comment.author))
-                comment.reply(message)
-                print('Replied to post!')
+            for keyWord in keyWords:
+                if (keyWord in comment.body) and (comment.author != reddit.user.me()):
+                    print('Found a post ' + comment.id ' by ' + comment.author)
+                    message = executeOrder66(str(comment.author))
+                    comment.reply(message)
+                    comment.save()
+                    print('Replied to post!')
 
 reddit = praw.Reddit('Reddit Bot', user_agent = 'Desktop:(by github.com/akashsara):Reddit Comment Analyzer Bot')
 
 while True:
     runBot(reddit)
-    time.sleep(300)
+    #time.sleep(300)
