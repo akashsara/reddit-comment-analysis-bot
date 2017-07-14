@@ -59,9 +59,11 @@ def getSubmissionData(redditor):
     submissionList = []
     noLinks = 0
     for submissions in redditor.submissions.top('all'):
-        if submissions.selftext:
+        if submissions.is_self:
             submissionList.append(submissions.selftext)
         else:
+            if(submissions.selftext):
+                submissionList.append(submissions.selftext)
             noLinks += 1
         subredditList = addToSubredditList(subredditList, submissions)
     return subredditList, submissionList, noLinks
