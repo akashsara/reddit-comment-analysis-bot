@@ -126,7 +126,7 @@ def executeOrder66(username):
     return message
 
 def runBot(reddit):
-    subredditList = ['lansbot', 'india']
+    subredditList = ['lansbot', 'learnpython', 'india']
     keyWords = ['!!AnalyseMe', '!!AnalyzeMe', '!!analyseme', '!!ANALYSEME', '!!analyzeme', '!!ANALYZEME']
     for subreddit in subredditList:
         print('On ' + str(subreddit))
