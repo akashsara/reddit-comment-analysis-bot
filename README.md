@@ -4,7 +4,9 @@
 
 It's a bot that analyses the entire* comment history of a reddit user and replies with its findings.
 
-\* - _Some comments may be unavailable due to how the reddit API works._
+[Link to bot](https://reddit.com/u/lansbot)
+
+_Some comments may be unavailable due to how the reddit API works._
 
 ## Features:
 
